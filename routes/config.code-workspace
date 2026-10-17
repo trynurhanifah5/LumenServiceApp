@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "../../../../xampp/htdocs/php-service-app/config"
+		},
+		{
+			"path": "../../../../xampp/htdocs/php-service-app/controller"
+		},
+		{
+			"path": "../../../../xampp/htdocs/php-service-app/core"
+		}
+	]
+}
