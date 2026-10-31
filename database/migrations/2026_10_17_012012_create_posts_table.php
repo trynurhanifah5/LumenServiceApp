@@ -17,7 +17,6 @@ return new class extends Migration
             $table->id(); // Field 1 (Primary Key)
             $table->string('title'); // Field 2
             $table->text('content'); // Field 3
-            $table->string('slug')->unique(); // Field 4
             $table->enum('status', ['draft', 'published', 'archived'])->default('draft'); // Field 5
             $table->integer('views_count')->default(0); // Field 6
             $table->foreignId('user_id'); // Field 7

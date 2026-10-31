@@ -37,14 +37,14 @@ class PostsController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Requesr $request)
+    public function store(Request $request)
     {
         $acceptHeader = $request->header('Accept');
 
         // validasi: hanya application/json atau application/xml yang valid
         if ($acceptHeader === 'application/json' || $acceptHeader === 'application/xml') {
 
-            $contentTypeHeade = $request->header('Content-Type');
+            $contentTypeHeader = $request->header('Content-Type');
 
             // validasi: hanya application/json yang valid
             if ($contentTypeHeader === 'application/json') {
