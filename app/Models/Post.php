@@ -6,10 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class Post extends Model
 {
-    // Post -> table_name = posts
-    // custome table name :
-    // protected $table='table_name'
+    public $timestamps = true;
 
-    // define cloumn name
-    protected $fillable = array('title', 'content', 'status', 'user_id');
+    protected $table = 'posts';
+
+    protected $fillable = [
+        'title',
+        'content',
+        'slug',
+        'status',
+        'views_count',
+        'user_id',
+        'published_at',
+    ];
 }

@@ -4,33 +4,34 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePostsTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
-     * 
+     *
      * @return void
      */
-    public function up(): void
+    public function up()
     {
         Schema::create('posts', function (Blueprint $table) {
-            $table->bigIncrements('id');
-
-            $table->string('title', 100);
-            $table->enum('status', array('draft', 'published'))->default('draft');
-            $table->text('content', 65535);
-            $table->integer('user_id')->index('user_id_freign');
-
-            $table->timestamps();
+            $table->id(); // Field 1 (Primary Key)
+            $table->string('title'); // Field 2
+            $table->text('content'); // Field 3
+            $table->string('slug')->unique(); // Field 4
+            $table->enum('status', ['draft', 'published', 'archived'])->default('draft'); // Field 5
+            $table->integer('views_count')->default(0); // Field 6
+            $table->foreignId('user_id'); // Field 7
+            $table->timestamp('published_at')->nullable(); // Field 8
+            $table->timestamps(); // created_at & updated_at
         });
     }
 
     /**
      * Reverse the migrations.
-     * 
+     *
      * @return void
      */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('posts');
     }

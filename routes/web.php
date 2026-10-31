@@ -1,16 +1,13 @@
 <?php
 
+use App\Http\Controllers\PostsController;
+
 /** @var \Laravel\Lumen\Routing\Router $router */
 
 /*
 |--------------------------------------------------------------------------
 | Application Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register all of the routes for an application.
-| It is a breeze. Simply tell Lumen the URIs it should respond to
-| and give it the Closure to call when that URI is requested.
-|
 */
 
 // Data dummy pengguna
@@ -60,12 +57,12 @@ $router->get('/', function () {
     ]);
 });
 
-// 1. Endpoint Posts (CRUD lengkap menggunakan PostsController)
-$router->get('posts', 'PostsController@index');
-$router->post('posts', 'PostsController@store');
-$router->get('posts/{id}', 'PostsController@show');
-$router->put('posts/{id}', 'PostsController@update');
-$router->delete('posts/{id}', 'PostsController@destroy');
+// 1. Endpoint Posts (RESTful API CRUD menggunakan PostsController khusus Lumen)
+$router->get('/posts', 'PostsController@index');
+$router->post('/posts', 'PostsController@store');
+$router->get('/posts/{id}', 'PostsController@show');
+$router->put('/posts/{id}', 'PostsController@update');
+$router->delete('/posts/{id}', 'PostsController@destroy');
 
 // 2. Endpoint GET /users (Menggunakan data dummy)
 $router->get('/users', function () use ($users) {
@@ -74,7 +71,6 @@ $router->get('/users', function () use ($users) {
 
 // 3. Endpoint GET /users/{userId} (Menggunakan data dummy berdasarkan ID)
 $router->get('/users/{userId}', function ($userId) use ($users) {
-    // Cari user berdasarkan ID
     $filteredUser = null;
     foreach ($users as $user) {
         if ($user['id'] == $userId) {
@@ -83,7 +79,6 @@ $router->get('/users/{userId}', function ($userId) use ($users) {
         }
     }
 
-    // Jika user ditemukan, kembalikan data; jika tidak, berikan pesan error 404
     if ($filteredUser) {
         return response()->json($filteredUser);
     } else {
