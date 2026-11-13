@@ -28,4 +28,29 @@ class PostsController extends Controller
 
         return response()->json($response, 200);
     }
+
+    /**
+     * Store a newly created resource in stroge.
+     * @param Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        $input = $request->all();
+        $validationRules = [
+            'title' => 'required|min:5',
+            'content' => 'required|min:10',
+            'status' => 'required|in:draft,published',
+            'user_id' => 'required|exists:users,id'
+        ];
+
+        $validator = \Validator::make($input, $validationRules);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+
+        $post = Post::create($input);
+        return response()->json($post, 200);
+    }
 }
