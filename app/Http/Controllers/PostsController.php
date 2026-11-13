@@ -53,4 +53,42 @@ class PostsController extends Controller
         $post = Post::create($input);
         return response()->json($post, 200);
     }
+
+    /**
+     * Update the specified resource in stroge.
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
+     * @retuen \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        $input = $request->all();
+
+        $post = Post::find($id);
+
+        if(!$post) {
+            abort(404);
+        }
+
+        // validation
+        $validationRules = [
+            'title' => 'required|min:5',
+            'content' => 'required|min:10',
+            'status' => 'required|in:draft,published',
+            'user_id' => 'required|exists:users,id'
+        ];
+
+        $validator = \Validator::make($input, $validationRules);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+        // validation end
+
+        $post->fill($input);
+        $post->save();
+
+        return response()->json($post, 200);
+    }
 }
