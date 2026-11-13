@@ -9,54 +9,25 @@ class PostsController extends Controller
 {
     /**
      * Display a listing of the resource.
-     * 
-     * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
     {
-        $acceptHeader = $request->header('Accept');
+        // Ambil data dengan paginate
+        $posts = Post::orderBy("id", "DESC")->paginate(10);
 
-        // validasi: hanya application/json atau application/xml yang valid
-        if ($acceptHeader === 'application/json' || $acceptHeader === 'application/xml') {
-            $posts = Post::OrderBy("id", "DESC")->paginate(10);
-
-            $outPut = [
-                "message" => "posts",
-                "results" => $posts
+        // Ubah struktur item di dalam data agar urutan key-nya sesuai dengan referensi
+        $posts->getCollection()->transform(function ($post) {
+            return [
+                "id"         => $post->id,
+                "title"      => $post->title,
+                "status"     => $post->status,
+                "content"    => $post->content,
+                "user_id"    => $post->user_id,
+                "created_at" => $post->created_at,
+                "updated_at" => $post->updated_at,
             ];
+        });
 
-            return response()->json($posts, 200);
-        } else {
-            return response('Not Acceptable!', 406);
-        }
-    }
-
-    /**
-     * Store a newly created resource in stroge.
-     * 
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        $acceptHeader = $request->header('Accept');
-
-        // validasi: hanya application/json atau application/xml yang valid
-        if ($acceptHeader === 'application/json' || $acceptHeader === 'application/xml') {
-
-            $contentTypeHeader = $request->header('Content-Type');
-
-            // validasi: hanya application/json yang valid
-            if ($contentTypeHeader === 'application/json') {
-                $input = $request->all();
-                $post = Post::create($input);
-
-                return response()->json($post, 200);
-            } else {
-                return response('Unsupported media Type', 415);
-            }
-        } else {
-            return response('Not Acceptable!', 406);
-        }
+        return response()->json($posts, 200);
     }
 }
