@@ -9,25 +9,23 @@ class PostsController extends Controller
 {
     /**
      * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
     {
-        // Ambil data dengan paginate
-        $posts = Post::orderBy("id", "DESC")->paginate(10);
+        $posts = Post::orderBy("id", "DESC")->paginate(2)->toArray();
 
-        // Ubah struktur item di dalam data agar urutan key-nya sesuai dengan referensi
-        $posts->getCollection()->transform(function ($post) {
-            return [
-                "id"         => $post->id,
-                "title"      => $post->title,
-                "status"     => $post->status,
-                "content"    => $post->content,
-                "user_id"    => $post->user_id,
-                "created_at" => $post->created_at,
-                "updated_at" => $post->updated_at,
-            ];
-        });
+        $response = [
+            "total_count"  => $posts["total"],
+            "limit"        => $posts["per_page"],
+            "pagination"   => [
+                "next_page"    => $posts["next_page_url"],
+                "current_page" => $posts["current_page"]
+            ],
+            "data"         => $posts["data"]
+        ];
 
-        return response()->json($posts, 200);
+        return response()->json($response, 200);
     }
 }
