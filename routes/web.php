@@ -86,9 +86,9 @@ $router->get('/users/{userId}', function ($userId) use ($users) {
             "message" => "User tidak ditemukan"
         ], 404);
     }
-}); // <-- Penutup route /users/{userId} yang tadinya kurang
+});
 
-// 4. Endpoint Authentication Group
+// authentication
 $router->group(['prefix' => 'auth'], function () use ($router) {
     // Matches "/auth/register"
     $router->post('/register', 'AuthController@register');
