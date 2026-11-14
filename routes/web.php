@@ -92,4 +92,5 @@ $router->get('/users/{userId}', function ($userId) use ($users) {
 $router->group(['prefix' => 'auth'], function () use ($router) {
     // Matches "/auth/register"
     $router->post('/register', 'AuthController@register');
+    $router->post('/login', 'AuthController@login');
 });
