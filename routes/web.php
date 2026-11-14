@@ -94,3 +94,12 @@ $router->group(['prefix' => 'auth'], function () use ($router) {
     $router->post('/register', 'AuthController@register');
     $router->post('/login', 'AuthController@login');
 });
+
+// Post
+Route::group(['middleware' => ['auth']], function ($router) {
+    $router->get('/posts', 'PostsController@index');
+    $router->post('/posts', 'PostsController@store');
+    $router->get('/posts/{id}', 'PostsController@update');
+    $router->put('/posts/{id}', 'PostsController@update');
+    $router->delete('/posts/{id}', 'PostsController@destroy');
+});
