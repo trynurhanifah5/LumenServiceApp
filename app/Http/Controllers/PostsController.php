@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PostsController extends Controller
 {
@@ -14,7 +15,7 @@ class PostsController extends Controller
      */
     public function index(Request $request)
     {
-        $posts = Post::orderBy("id", "DESC")->paginate(2)->toArray();
+        $posts = Post::Where(["user_id" => Auth::user()->id])->OrderBy("id", "DESC")->paginate(2)->toArray();
 
         $response = [
             "total_count"  => $posts["total"],
