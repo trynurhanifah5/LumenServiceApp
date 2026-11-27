@@ -15,7 +15,7 @@ class PostsController extends Controller
      */
     public function index(Request $request)
     {
-        $posts = Post::Where(["user_id" => Auth::user()->id])->OrderBy("id", "DESC")->paginate(2)->toArray();
+        $posts = Post::where("user_id", Auth::id())->orderBy("id", "DESC")->paginate(2)->toArray();
 
         $response = [
             "total_count"  => $posts["total"],
@@ -31,65 +31,94 @@ class PostsController extends Controller
     }
 
     /**
-     * Store a newly created resource in stroge.
+     * Store a newly created resource in storage.
+     * 
      * @param Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        $input = $request->all();
-        $validationRules = [
-            'title' => 'required|min:5',
+        $this->validate($request, [
+            'title'   => 'required|min:5',
             'content' => 'required|min:10',
-            'status' => 'required|in:draft,published',
-            'user_id' => 'required|exists:users,id'
-        ];
+            'status'  => 'required|in:draft,published',
+        ]);
 
-        $validator = \Validator::make($input, $validationRules);
-
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
-        }
+        $input = $request->all();
+        // Otomatis assign user_id dari user yang sedang login via JWT token
+        $input['user_id'] = Auth::id();
 
         $post = Post::create($input);
-        return response()->json($post, 200);
+        
+        return response()->json([
+            'message' => 'Post berhasil ditambahkan',
+            'data'    => $post
+        ], 201);
     }
 
     /**
-     * Update the specified resource in stroge.
+     * Display the specified resource.
+     *
+     * @param int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        $post = Post::where('id', $id)->where('user_id', Auth::id())->first();
+
+        if (!$post) {
+            return response()->json(['message' => 'Post tidak ditemukan'], 404);
+        }
+
+        return response()->json(['data' => $post], 200);
+    }
+
+    /**
+     * Update the specified resource in storage.
      * 
      * @param \Illuminate\Http\Request $request
      * @param int $id
-     * @retuen \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
-        $input = $request->all();
+        $post = Post::where('id', $id)->where('user_id', Auth::id())->first();
 
-        $post = Post::find($id);
-
-        if(!$post) {
-            abort(404);
+        if (!$post) {
+            return response()->json(['message' => 'Post tidak ditemukan'], 404);
         }
 
-        // validation
-        $validationRules = [
-            'title' => 'required|min:5',
+        $this->validate($request, [
+            'title'   => 'required|min:5',
             'content' => 'required|min:10',
-            'status' => 'required|in:draft,published',
-            'user_id' => 'required|exists:users,id'
-        ];
+            'status'  => 'required|in:draft,published',
+        ]);
 
-        $validator = \Validator::make($input, $validationRules);
-
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
-        }
-        // validation end
-
-        $post->fill($input);
+        $post->fill($request->all());
         $post->save();
 
-        return response()->json($post, 200);
+        return response()->json([
+            'message' => 'Post berhasil diperbarui',
+            'data'    => $post
+        ], 200);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        $post = Post::where('id', $id)->where('user_id', Auth::id())->first();
+
+        if (!$post) {
+            return response()->json(['message' => 'Post tidak ditemukan'], 404);
+        }
+
+        $post->delete();
+
+        return response()->json(['message' => 'Post berhasil dihapus'], 200);
     }
 }

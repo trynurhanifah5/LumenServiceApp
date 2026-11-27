@@ -57,19 +57,12 @@ $router->get('/', function () {
     ]);
 });
 
-// 1. Endpoint Posts (RESTful API CRUD menggunakan PostsController khusus Lumen)
-$router->get('/posts', 'PostsController@index');
-$router->post('/posts', 'PostsController@store');
-$router->get('/posts/{id}', 'PostsController@show');
-$router->put('/posts/{id}', 'PostsController@update');
-$router->delete('/posts/{id}', 'PostsController@destroy');
-
-// 2. Endpoint GET /users (Menggunakan data dummy)
+// 1. Endpoint GET /users (Menggunakan data dummy)
 $router->get('/users', function () use ($users) {
     return response()->json($users);
 });
 
-// 3. Endpoint GET /users/{userId} (Menggunakan data dummy berdasarkan ID)
+// 2. Endpoint GET /users/{userId} (Menggunakan data dummy berdasarkan ID)
 $router->get('/users/{userId}', function ($userId) use ($users) {
     $filteredUser = null;
     foreach ($users as $user) {

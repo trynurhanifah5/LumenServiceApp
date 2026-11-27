@@ -77,13 +77,8 @@ $app->configure('app');
 // ]);
 
 $app->routeMiddleware([
-    'auth' => App\Http\Middleware\Authenticate::class,
-    // 'login' => App\Http\Middleware\LoginMiddleware::class,
-]);
-
-$app->routeMiddleware([
-     // 'auth' => App\Http\Middleware\Authenticate::class,
-     'login' => App\Http\Middleware\LoginMiddleware::class,
+    'auth' => Tymon\JWTAuth\Http\Middleware\Authenticate::class,
+    'login' => App\Http\Middleware\LoginMiddleware::class,
 ]);
 
 /*
@@ -101,10 +96,8 @@ $app->routeMiddleware([
 $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 
-// tambahkan line ini
+// Pendaftaran Service Provider JWT
 $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
-
-// $app->register(App\Providers\AppServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
