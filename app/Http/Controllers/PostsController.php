@@ -16,36 +16,28 @@ class PostsController extends Controller
      */
     public function index(Request $request)
     {
-        // authorization
-        // check if current user is authorized to do this action
-
         if (Gate::denies('read-post')) {
             return response()->json([
                 'success' => false,
-                'status' => 403,
+                'status'  => 403,
                 'message' => 'You are unauthorized'
             ], 403);
         }
 
         if (Auth::user()->role === 'admin') {
-            // kalau admin, akan query semua posts record
-            $posts = Post::OrderBy("id", "DESC")->paginate(2)->toArray();
+            $posts = Post::orderBy('id', 'DESC')->paginate(2)->toArray();
         } else {
-            // kalau bukan admin, akan query post sesuai dengan user id login s
-            $posts = Post::Where(['user_id' => Auth::User()->id])->OrderBy("id", "DESC")->paginate(2)->toArray();
+            $posts = Post::where('user_id', Auth::id())->orderBy('id', 'DESC')->paginate(2)->toArray();
         }
-        // authorization end
-        
-        $posts = Post::where("user_id", Auth::id())->orderBy("id", "DESC")->paginate(2)->toArray();
 
         $response = [
-            "total_count"  => $posts["total"],
-            "limit"        => $posts["per_page"],
-            "pagination"   => [
-                "next_page"    => $posts["next_page_url"],
-                "current_page" => $posts["current_page"]
+            'total_count'  => $posts['total'],
+            'limit'        => $posts['per_page'],
+            'pagination'   => [
+                'next_page'    => $posts['next_page_url'],
+                'current_page' => $posts['current_page']
             ],
-            "data"         => $posts["data"]
+            'data'         => $posts['data']
         ];
 
         return response()->json($response, 200);
@@ -53,8 +45,8 @@ class PostsController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     * 
-     * @param Illuminate\Http\Request $request
+     *
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -70,7 +62,7 @@ class PostsController extends Controller
         $input['user_id'] = Auth::id();
 
         $post = Post::create($input);
-        
+
         return response()->json([
             'message' => 'Post berhasil ditambahkan',
             'data'    => $post
@@ -96,7 +88,7 @@ class PostsController extends Controller
 
     /**
      * Update the specified resource in storage.
-     * 
+     *
      * @param \Illuminate\Http\Request $request
      * @param int $id
      * @return \Illuminate\Http\Response
