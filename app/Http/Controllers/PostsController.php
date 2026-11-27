@@ -25,19 +25,14 @@ class PostsController extends Controller
         }
 
         if (Auth::user()->role === 'admin') {
-            $posts = Post::orderBy('id', 'DESC')->paginate(2)->toArray();
+            $posts = Post::orderBy('id', 'ASC')->get();
         } else {
-            $posts = Post::where('user_id', Auth::id())->orderBy('id', 'DESC')->paginate(2)->toArray();
+            $posts = Post::where('user_id', Auth::id())->orderBy('id', 'ASC')->get();
         }
 
         $response = [
-            'total_count'  => $posts['total'],
-            'limit'        => $posts['per_page'],
-            'pagination'   => [
-                'next_page'    => $posts['next_page_url'],
-                'current_page' => $posts['current_page']
-            ],
-            'data'         => $posts['data']
+            'total_count' => $posts->count(),
+            'data'        => $posts
         ];
 
         return response()->json($response, 200);
@@ -99,6 +94,14 @@ class PostsController extends Controller
 
         if (!$post) {
             return response()->json(['message' => 'Post tidak ditemukan'], 404);
+        }
+
+        if (Gate::denies('update-post', $post)) {
+            return response()->json([
+                'success' => false,
+                'status'  => 403,
+                'message' => 'You are unauthorized'
+            ], 403);
         }
 
         $this->validate($request, [
