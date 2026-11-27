@@ -32,7 +32,7 @@ class PostsController extends Controller
             $posts = Post::OrderBy("id", "DESC")->paginate(2)->toArray();
         } else {
             // kalau bukan admin, akan query post sesuai dengan user id login s
-            $posts = Post::Where(['uer_id' => Auth::User()->id])->OrderBy("id", "DESC")->paginate(2)->toArray();
+            $posts = Post::Where(['user_id' => Auth::User()->id])->OrderBy("id", "DESC")->paginate(2)->toArray();
         }
         // authorization end
         
