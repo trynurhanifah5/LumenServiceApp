@@ -36,18 +36,35 @@ class AuthServiceProvider extends ServiceProvider
          */
 
         // Register Post policy
+        Gate::define('create-post', function ($user) {
+            return $user->role == 'editor' || $user->role == 'admin';
+        });
+
         Gate::define('read-post', function ($user) {
             return $user->role == 'editor' || $user->role == 'admin';
         });
 
         Gate::define('update-post', function ($user, $post) {
-            //check is dmin or is editor
+            // check is admin or is editor
             if ($user->role == 'admin') {
                 // if admin return true
                 return true;
             } else if ($user->role == 'editor') {
                 // if editor check user id
-                return $post->user_id === $user->id;
+                return $post->user_id == $user->id;
+            } else {
+                return false;
+            }
+        });
+
+        Gate::define('delete-post', function ($user, $post) {
+            // check is admin or is editor
+            if ($user->role == 'admin') {
+                // if admin return true
+                return true;
+            } else if ($user->role == 'editor') {
+                // if editor check user id
+                return $post->user_id == $user->id;
             } else {
                 return false;
             }
