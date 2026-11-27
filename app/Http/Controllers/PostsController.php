@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class PostsController extends Controller
 {
@@ -15,6 +16,26 @@ class PostsController extends Controller
      */
     public function index(Request $request)
     {
+        // authorization
+        // check if current user is authorized to do this action
+
+        if (Gate::denies('read-post')) {
+            return response()->json([
+                'success' => false,
+                'status' => 403,
+                'message' => 'You are unauthorized'
+            ], 403);
+        }
+
+        if (Auth::user()->role === 'admin') {
+            // kalau admin, akan query semua posts record
+            $posts = Post::OrderBy("id", "DESC")->paginate(2)->toArray();
+        } else {
+            // kalau bukan admin, akan query post sesuai dengan user id login s
+            $posts = Post::Where(['uer_id' => Auth::User()->id])->OrderBy("id", "DESC")->paginate(2)->toArray();
+        }
+        // authorization end
+        
         $posts = Post::where("user_id", Auth::id())->orderBy("id", "DESC")->paginate(2)->toArray();
 
         $response = [
