@@ -46,6 +46,14 @@ class PostsController extends Controller
      */
     public function store(Request $request)
     {
+        if (Gate::denies('create-post')) {
+            return response()->json([
+                'success' => false,
+                'status'  => 403,
+                'message' => 'You are unauthorized'
+            ], 403);
+        }
+
         $this->validate($request, [
             'title'   => 'required|min:5',
             'content' => 'required|min:10',
@@ -72,10 +80,26 @@ class PostsController extends Controller
      */
     public function show($id)
     {
-        $post = Post::where('id', $id)->where('user_id', Auth::id())->first();
+        if (Gate::denies('read-post')) {
+            return response()->json([
+                'success' => false,
+                'status'  => 403,
+                'message' => 'You are unauthorized'
+            ], 403);
+        }
+
+        $post = Post::find($id);
 
         if (!$post) {
             return response()->json(['message' => 'Post tidak ditemukan'], 404);
+        }
+
+        if (Auth::user()->role !== 'admin' && (int) $post->user_id !== (int) Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'status'  => 403,
+                'message' => 'You are unauthorized'
+            ], 403);
         }
 
         return response()->json(['data' => $post], 200);
@@ -90,7 +114,7 @@ class PostsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $post = Post::where('id', $id)->where('user_id', Auth::id())->first();
+        $post = Post::find($id);
 
         if (!$post) {
             return response()->json(['message' => 'Post tidak ditemukan'], 404);
@@ -127,10 +151,18 @@ class PostsController extends Controller
      */
     public function destroy($id)
     {
-        $post = Post::where('id', $id)->where('user_id', Auth::id())->first();
+        $post = Post::find($id);
 
         if (!$post) {
             return response()->json(['message' => 'Post tidak ditemukan'], 404);
+        }
+
+        if (Gate::denies('delete-post', $post)) {
+            return response()->json([
+                'success' => false,
+                'status'  => 403,
+                'message' => 'You are unauthorized'
+            ], 403);
         }
 
         $post->delete();
