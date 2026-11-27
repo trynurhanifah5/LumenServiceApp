@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\User;
+use App\Models\Post;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -30,10 +31,23 @@ class AuthServiceProvider extends ServiceProvider
         // should return either a User instance or null. You're free to obtain
         // the User instance via an API token or any other method necessary.
 
+        /**
+         * Register Post policy
+         */
+
+        // Register Post policy
+        Gate::define('read-post', function ($user) {
+            return $user->role == 'editor' || $user->role == 'admin';
+        });
+
+        //** Register policy End*/
+
+        // authentication start
         $this->app['auth']->viaRequest('api', function ($request) {
             if ($request->input('api_token')) {
                 return User::where('api_token', $request->input('api_token'))->first();
             }
         });
+        // authentication start
     }
 }
